@@ -4,6 +4,7 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import processing.serial.*; 
+import controlP5.*; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.io.IOException; 
 
 public class AuftauschrankCP extends PApplet {
+
 
 
 
@@ -30,8 +32,14 @@ Serial myPort;
 PImage img;
 PFont fontHeading;
 PFont fontNormal;
+ControlP5 cp5;
 
 public void setup() {
+  cp5 = new ControlP5(this);
+  cp5.addButton("Min+").setPosition(570,385).setSize(50,20);
+  cp5.addButton("Min-").setPosition(630,385).setSize(50,20);
+  cp5.addButton("Max+").setPosition(570,415).setSize(50,20);
+  cp5.addButton("Max-").setPosition(630,415).setSize(50,20);
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
@@ -58,7 +66,7 @@ public void draw() {
 }
 
 public void drawText() {
-  int xPos = 380;
+  int xPos = 350;
   int yPos = 340;
   int lineSpacing = 30;
   textFont(fontNormal);
@@ -76,15 +84,20 @@ public void drawText() {
 
 public void drawGraph() {
   //Aktuelle Temperatur
+  fill(255);
+  rect(30,200,100,250);
+
+  int mx = PApplet.parseInt(map(tempMax,60,0,0,250));
+  int ms = PApplet.parseInt(map(tempMin,60,0,0,250));
+  fill(0,255,0);
+  rect(30,mx+200,100,ms-mx);
+  //println(mx + "  " + ms + " " + (ms-mx));
+
   int m = PApplet.parseInt(map(t,60,0,0,250));
   fill(255,0,0);
   rect(30,m+200,100,250-m);
-  m = PApplet.parseInt(map(tempMin,60,0,0,250));
-  fill(0,255,0);
-  rect(30,m+200,100,3);
-  m = PApplet.parseInt(map(tempMax,60,0,0,250));
-  fill(0,0,255);
-  rect(30,m+200,100,3);
+
+
   if (t != 0) {
     textFont(fontNormal);
     text("Temp.: " + t + "°C",30,470);

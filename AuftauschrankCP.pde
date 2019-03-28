@@ -1,4 +1,5 @@
 import processing.serial.*;
+import controlP5.*;
 
 boolean startup = true;
 
@@ -12,8 +13,14 @@ Serial myPort;
 PImage img;
 PFont fontHeading;
 PFont fontNormal;
+ControlP5 cp5;
 
 void setup() {
+  cp5 = new ControlP5(this);
+  cp5.addButton("Min+").setPosition(570,385).setSize(50,20);
+  cp5.addButton("Min-").setPosition(630,385).setSize(50,20);
+  cp5.addButton("Max+").setPosition(570,415).setSize(50,20);
+  cp5.addButton("Max-").setPosition(630,415).setSize(50,20);
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
@@ -40,7 +47,7 @@ void draw() {
 }
 
 void drawText() {
-  int xPos = 380;
+  int xPos = 350;
   int yPos = 340;
   int lineSpacing = 30;
   textFont(fontNormal);
@@ -58,15 +65,20 @@ void drawText() {
 
 void drawGraph() {
   //Aktuelle Temperatur
+  fill(255);
+  rect(30,200,100,250);
+
+  int mx = int(map(tempMax,60,0,0,250));
+  int ms = int(map(tempMin,60,0,0,250));
+  fill(0,255,0);
+  rect(30,mx+200,100,ms-mx);
+  //println(mx + "  " + ms + " " + (ms-mx));
+
   int m = int(map(t,60,0,0,250));
   fill(255,0,0);
   rect(30,m+200,100,250-m);
-  m = int(map(tempMin,60,0,0,250));
-  fill(0,255,0);
-  rect(30,m+200,100,3);
-  m = int(map(tempMax,60,0,0,250));
-  fill(0,0,255);
-  rect(30,m+200,100,3);
+
+
   if (t != 0) {
     textFont(fontNormal);
     text("Temp.: " + t + "°C",30,470);
