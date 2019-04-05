@@ -2,11 +2,14 @@ import processing.serial.*;
 import controlP5.*;
 
 boolean startup = true;
+boolean newData;
+
+boolean connectionInit = false;
 
 float t = 0;
 float h = 0;
-float tempMin = 10;
-float tempMax = 10;
+float tempMin = 0;
+float tempMax = 0;
 String portStream;
 
 Serial myPort;
@@ -17,10 +20,10 @@ ControlP5 cp5;
 
 void setup() {
   cp5 = new ControlP5(this);
-  cp5.addButton("Min+").setPosition(570,385).setSize(50,20);
-  cp5.addButton("Min-").setPosition(630,385).setSize(50,20);
-  cp5.addButton("Max+").setPosition(570,415).setSize(50,20);
-  cp5.addButton("Max-").setPosition(630,415).setSize(50,20);
+  cp5.addButton("MinP").setPosition(570,385).setSize(50,20).setLabel("+");
+  cp5.addButton("MinM").setPosition(630,385).setSize(50,20).setLabel("-");
+  cp5.addButton("MaxP").setPosition(570,415).setSize(50,20).setLabel("+");
+  cp5.addButton("MaxM").setPosition(630,415).setSize(50,20).setLabel("-");
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
@@ -28,11 +31,12 @@ void setup() {
   fontNormal = createFont("Fredoka One",14);
   img = loadImage("logo.png");
   size(700,500,P3D);
+float t = 0;
   background(255);
 }
 void draw() {
-  background(255);
   getData();
+  background(255);
   if (startup == false){
     //Titelleiste
     fill(255, 204, 77);
@@ -40,8 +44,8 @@ void draw() {
     fill(0);
     textFont(fontHeading);
     text("Auftau Schrank Übersicht",250,60);
-    drawGraph();
-    drawText();
+    drawGraph(); // Diagramme zeichnen
+    drawText(); // Text zeichenen
   }
   logo();
 }
@@ -87,6 +91,8 @@ void drawGraph() {
     text("Sensor Fehler",30,470);
   }
   //Aktuelle Luftfeuchtigkeit
+  fill(255);
+  rect(150,200,100,250);
   m = int(map(h,100,0,0,250));
   fill(100,100,200);
   rect(150,m+200,100,250-m);
@@ -100,14 +106,26 @@ void drawGraph() {
 }
 
 void getData() {
-  if (portStream != null) {
-    if (portStream.charAt(0) == '#' && portStream.charAt(portStream.length()-3) == ';') {
-      t = float(portStream.substring(portStream.indexOf("T")+1,portStream.indexOf("H")-1));
-      h = float(portStream.substring(portStream.indexOf("H")+1,portStream.indexOf("S")-1));
-      tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
-      tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
+
+  if (portStream != null && newData == true) {
+    println("receive: " + portStream);
+    if (portStream != "Hi"){
+      if (portStream.charAt(0) == '#' && portStream.charAt(portStream.length()-1) == ';') {
+        t = float(portStream.substring(portStream.indexOf("T")+1,portStream.indexOf("H")-1));
+        h = float(portStream.substring(portStream.indexOf("H")+1,portStream.indexOf("S")-1));
+        tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
+        tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
+      }
     }
+    newData = false;
+    delay(500);
+    sendData();
   }
+}
+
+void sendData() {
+  myPort.write("S" + tempMin + "X" + tempMax + ";");
+  println("send: " + "S" + tempMin + "X" + tempMax + ";");
 }
 
 int yPos=100;
@@ -127,10 +145,31 @@ void logo() {
   }
   runs++;
 }
-
+public void MaxP() {
+  println("MaxP");
+  tempMax++;
+  sendData();
+}
+public void MaxM() {
+  println("MaxM");
+  tempMax--;
+  sendData();
+}
+public void MinP() {
+  println("MinP");
+  tempMin++;
+  sendData();
+}
+public void MinM() {
+  println("MinM");
+  tempMin--;
+  sendData();
+}
 void keyPressed() {
   println(key);
 }
 void serialEvent(Serial myPort) {
-  portStream = myPort.readString();
+  String input = myPort.readString();
+  portStream = input.substring(0,input.length()-2);
+  newData = true;
 }
