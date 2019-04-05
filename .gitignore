@@ -11,5 +11,5 @@ application.linux64
 application.windows32
 application.windows64
 application.macosx
-
+build
 # End of https://www.gitignore.io/api/processing
