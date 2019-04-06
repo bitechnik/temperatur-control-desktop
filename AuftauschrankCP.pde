@@ -10,6 +10,8 @@ float t = 0;
 float h = 0;
 float tempMin = 0;
 float tempMax = 0;
+float newMin = 0;
+float newMax = 0;
 String portStream;
 
 Serial myPort;
@@ -112,10 +114,8 @@ void getData() {
       if (portStream.charAt(0) == '#' && portStream.charAt(portStream.length()-1) == ';') {
         t = float(portStream.substring(portStream.indexOf("T")+1,portStream.indexOf("H")-1));
         h = float(portStream.substring(portStream.indexOf("H")+1,portStream.indexOf("S")-1));
-        if (portStream.length() > 16) {
-          tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
-          tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
-        }
+        tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
+        tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
       }
     }
     newData = false;
@@ -126,9 +126,9 @@ void getData() {
 }
 
 void sendData() {
-  String data = "S" + tempMin + "X" + tempMax + ";";
+  String data = "S" + newMin + "X" + newMax + ";";
   myPort.write(data);
-  println("send: " + "S" + tempMin + "X" + tempMax + ";");
+  println("send: " + "S" + newMin + "X" + newMax + ";");
 }
 
 int yPos=100;
@@ -150,19 +150,19 @@ void logo() {
 }
 public void MaxP() {
   println("MaxP");
-  tempMax++;
+  newMax++;
 }
 public void MaxM() {
   println("MaxM");
-  tempMax--;
+  newMax--;
 }
 public void MinP() {
   println("MinP");
-  tempMin++;
+  newMin++;
 }
 public void MinM() {
   println("MinM");
-  tempMin--;
+  newMin--;
 }
 void keyPressed() {
   println(key);
