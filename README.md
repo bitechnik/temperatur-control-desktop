@@ -5,6 +5,7 @@ Dieses Projekt ist eine Desktop Software für die [Arduino Temperatursteuerung](
 Über diese Software lassen sich die Werte auslesen und die gewünschte Temperatur einstellen.
 
 ## To-do
+- [ ] Beschleunigen durch ersetzen von delay()
 - [ ] Buttons beim start ausblenden
 - [ ] mehr Einstellungsmöglichkeiten
 - [ ] Temperaturverlauf anzeigen
