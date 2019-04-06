@@ -106,25 +106,28 @@ void drawGraph() {
 }
 
 void getData() {
-
   if (portStream != null && newData == true) {
     println("receive: " + portStream);
     if (portStream != "Hi"){
       if (portStream.charAt(0) == '#' && portStream.charAt(portStream.length()-1) == ';') {
         t = float(portStream.substring(portStream.indexOf("T")+1,portStream.indexOf("H")-1));
         h = float(portStream.substring(portStream.indexOf("H")+1,portStream.indexOf("S")-1));
-        tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
-        tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
+        if (portStream.length() > 16) {
+          tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
+          tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
+        }
       }
     }
     newData = false;
-    delay(500);
+    delay(2000);
     sendData();
+
   }
 }
 
 void sendData() {
-  myPort.write("S" + tempMin + "X" + tempMax + ";");
+  String data = "S" + tempMin + "X" + tempMax + ";";
+  myPort.write(data);
   println("send: " + "S" + tempMin + "X" + tempMax + ";");
 }
 
@@ -148,22 +151,18 @@ void logo() {
 public void MaxP() {
   println("MaxP");
   tempMax++;
-  sendData();
 }
 public void MaxM() {
   println("MaxM");
   tempMax--;
-  sendData();
 }
 public void MinP() {
   println("MinP");
   tempMin++;
-  sendData();
 }
 public void MinM() {
   println("MinM");
   tempMin--;
-  sendData();
 }
 void keyPressed() {
   println(key);
