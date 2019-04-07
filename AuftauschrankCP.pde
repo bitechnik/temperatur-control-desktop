@@ -3,6 +3,7 @@ import controlP5.*;
 
 boolean startup = true;
 boolean newData;
+boolean send = false;
 
 boolean connectionInit = false;
 
@@ -14,6 +15,8 @@ float newMin = 0;
 float newMax = 0;
 String portStream;
 
+long previousMillis = 0;
+
 Serial myPort;
 PImage img;
 PFont fontHeading;
@@ -22,10 +25,10 @@ ControlP5 cp5;
 
 void setup() {
   cp5 = new ControlP5(this);
-  cp5.addButton("MinP").setPosition(570,385).setSize(50,20).setLabel("+");
-  cp5.addButton("MinM").setPosition(630,385).setSize(50,20).setLabel("-");
-  cp5.addButton("MaxP").setPosition(570,415).setSize(50,20).setLabel("+");
-  cp5.addButton("MaxM").setPosition(630,415).setSize(50,20).setLabel("-");
+  cp5.addButton("MaxP").setPosition(570,385).setSize(50,20).setLabel("+");
+  cp5.addButton("MaxM").setPosition(630,385).setSize(50,20).setLabel("-");
+  cp5.addButton("MinP").setPosition(570,415).setSize(50,20).setLabel("+");
+  cp5.addButton("MinM").setPosition(630,415).setSize(50,20).setLabel("-");
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
@@ -50,6 +53,7 @@ void draw() {
     drawText(); // Text zeichenen
   }
   logo();
+  sendData();
 }
 
 void drawText() {
@@ -64,9 +68,9 @@ void drawText() {
   text("aktuelle Temperatur: " + t + "°C", xPos,yPos);
   fill(0,255,0);
   yPos += lineSpacing;
-  text("mindest Temperatur: " + tempMin + "°C", xPos,yPos);
+  text("maximal Temperatur: " + newMax + "°C", xPos,yPos);
   yPos += lineSpacing;
-  text("maximal Temperatur: " + tempMax + "°C", xPos,yPos);
+  text("mindest Temperatur: " + newMin + "°C", xPos,yPos);
 }
 
 void drawGraph() {
@@ -74,8 +78,8 @@ void drawGraph() {
   fill(255);
   rect(30,200,100,250);
 
-  int mx = int(map(tempMax,60,0,0,250));
-  int ms = int(map(tempMin,60,0,0,250));
+  int mx = int(map(newMax,60,0,0,250));
+  int ms = int(map(newMin,60,0,0,250));
   fill(0,255,0);
   rect(30,mx+200,100,ms-mx);
   //println(mx + "  " + ms + " " + (ms-mx));
@@ -116,19 +120,35 @@ void getData() {
         h = float(portStream.substring(portStream.indexOf("H")+1,portStream.indexOf("S")-1));
         tempMin = float(portStream.substring(portStream.indexOf("S")+1,portStream.indexOf("X")-1));
         tempMax = float(portStream.substring(portStream.indexOf("X")+1,portStream.indexOf(";")-1));
+        if (millis() < 10000) {
+          newMin = tempMin;
+          newMax = tempMax;
+        }
       }
     }
     newData = false;
-    delay(2000);
-    sendData();
+    previousMillis = millis();
+    send = true;
 
   }
 }
 
 void sendData() {
-  String data = "S" + newMin + "X" + newMax + ";";
-  myPort.write(data);
-  println("send: " + "S" + newMin + "X" + newMax + ";");
+  int currentMillis = millis();
+  int interval = 2000;
+  if (send == true && currentMillis - previousMillis >= interval) {
+    String data = "S" + newMin + "X" + newMax + ";";
+
+    if (millis() > 8000) {
+      myPort.write(data);
+      println("send: " + "S" + newMin + "X" + newMax + ";");
+    } else {
+      myPort.write("Hi");
+      println("send: Hi");
+    }
+    send = false;
+  }
+
 }
 
 int yPos=100;
