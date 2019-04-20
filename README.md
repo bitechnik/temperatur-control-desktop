@@ -6,6 +6,6 @@ Dieses Projekt ist eine Desktop Software für die [Arduino Temperatursteuerung](
 
 ## To-do
 - [ ] Beschleunigen durch ersetzen von delay()
-- [x] Buttons beim start ausblenden
 - [ ] mehr Einstellungsmöglichkeiten
 - [ ] Temperaturverlauf anzeigen
+- [x] Buttons beim start ausblenden
