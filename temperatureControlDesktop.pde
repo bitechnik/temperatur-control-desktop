@@ -6,6 +6,8 @@ boolean newData;
 boolean send = false;
 
 boolean connectionInit = false;
+boolean buttonsInit = false;
+
 
 float t = 0;
 float h = 0;
@@ -25,10 +27,6 @@ ControlP5 cp5;
 
 void setup() {
   cp5 = new ControlP5(this);
-  cp5.addButton("MaxP").setPosition(570,385).setSize(50,20).setLabel("+");
-  cp5.addButton("MaxM").setPosition(630,385).setSize(50,20).setLabel("-");
-  cp5.addButton("MinP").setPosition(570,415).setSize(50,20).setLabel("+");
-  cp5.addButton("MinM").setPosition(630,415).setSize(50,20).setLabel("-");
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
@@ -43,6 +41,7 @@ void draw() {
   getData();
   background(255);
   if (startup == false){
+    buttons();
     //Titelleiste
     fill(255, 204, 77);
     rect(0,0,width,100);
@@ -54,6 +53,16 @@ void draw() {
   }
   logo();
   sendData();
+}
+
+void buttons() {
+  if (buttonsInit == false) {
+    cp5.addButton("MaxP").setPosition(570,385).setSize(50,20).setLabel("+");
+    cp5.addButton("MaxM").setPosition(630,385).setSize(50,20).setLabel("-");
+    cp5.addButton("MinP").setPosition(570,415).setSize(50,20).setLabel("+");
+    cp5.addButton("MinM").setPosition(630,415).setSize(50,20).setLabel("-");
+  }
+  buttonsInit = true;
 }
 
 void drawText() {
