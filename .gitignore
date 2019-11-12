@@ -12,4 +12,11 @@ application.windows32
 application.windows64
 application.macosx
 build
+application.linux-arm64.zip
+application.linux-armv6hf.zip
+application.linux32.zip
+application.linux64.zip
+application.windows32.zip
+application.windows64.zip
+application.macosx.zip
 # End of https://www.gitignore.io/api/processing

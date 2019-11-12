@@ -30,8 +30,9 @@ void setup() {
   String portName = Serial.list()[0];
   myPort = new Serial(this, portName, 9600);
   myPort.bufferUntil('\n');
-  fontHeading = createFont("Fredoka One",27);
-  fontNormal = createFont("Fredoka One",14);
+  println(PFont.list());
+  fontHeading = createFont("Purisa Bold",27);
+  fontNormal = createFont("Dyuthi",18);
   img = loadImage("logo.png");
   size(700,500,P3D);
 float t = 0;
